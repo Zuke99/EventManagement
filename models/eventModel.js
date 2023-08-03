@@ -9,7 +9,6 @@ const eventSchema=new mongoose.Schema({
     seats:Number,
     category_id:Number,
     posterImage:String
-
-})
+});
 
 module.exports = mongoose.model('Events',eventSchema);
