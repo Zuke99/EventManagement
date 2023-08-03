@@ -4,4 +4,4 @@ mongoose.connect('mongodb+srv://eventmgmt:eventmgmt@eventmanagementcluster.b1x94
     console.log("Connection is successful");
 }).catch((e) => {
     console.log("No Connection");
-})
+});
