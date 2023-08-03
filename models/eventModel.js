@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const eventSchema=new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        unique: [true, "Event already exist"]
+    },
     description:String,
     seats:Number,
     category_id:Number,
