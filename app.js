@@ -4,6 +4,7 @@ app.use(express.json());
 
 // const mongoose = require('mongoose');
 // mongoose.connect('mongodb+srv://eventmgmt:eventmgmt@eventmanagementcluster.b1x94pb.mongodb.net/?retryWrites=true&w=majority')
+
 require("./db/conn");  //to create connection
 
 let port = 3000;
