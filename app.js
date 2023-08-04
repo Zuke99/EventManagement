@@ -7,11 +7,14 @@ app.use(express.json());
 
 require("./db/conn");  //to create connection
 
-let port = 3000;
+let port = 3001;
 const Events = require('./models/eventModel.js');
+const Users=require('./models/userModel');
 const EventRouter = require("./router/eventRouter");
+const UserRouter=require("./router/userRouter");
 
 app.use(EventRouter);
+app.use(UserRouter);
 
 //Port
 app.listen(port,function(){
