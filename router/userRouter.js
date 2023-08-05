@@ -29,7 +29,6 @@ router.post("/user/register", async (req, res) => {
         throw new Error(err);
       }
     };
-
     try {
       const [existingEmail, existingUsername] = await Promise.all([
         existEmail(),
@@ -40,27 +39,24 @@ router.post("/user/register", async (req, res) => {
       } else if (existingUsername) {
         res.send({ message: "Username Exists" });
       } else {
-        bcrypt.hash(password,10).then(hashedPassword => {
-            const addUser = new Users({
-                    name:req.body.name,
-                    username:username,
-                    password:hashedPassword,
-                    email:email,
-                    role:req.body.role
-                });
-            const createUser = addUser.save();
-            console.log(`User Registration SuccessFul, User Id: ${createUser._id}`);
-            res.status(201).send(createUser);
-            
-        }).catch(error => {
-            return res.status(500).send({error : "Enable to hash Pass"})
-        })
-       
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const addUser = new Users({
+          name: req.body.name,
+          username: username,
+          password: hashedPassword,
+          email: email,
+          role: req.body.role,
+        });
+        const createUser = await addUser.save();
+        console.log(`User Registration Successful, User Id: ${createUser._id}`);
+        res.status(201).send(createUser);
       }
     } catch (err) {
       console.error(err);
+      return res.status(500).send({ error: "Error occurred during registration" });
     }
   } catch (e) {
+    console.error(e);
     res.status(400).send(e);
   }
 });
