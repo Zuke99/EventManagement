@@ -49,8 +49,9 @@ router.post("/user/register", async (req, res) => {
                     role:req.body.role
                 });
             const createUser = addUser.save();
-            res.status(201).send(createUser);
             console.log(`User Registration SuccessFul, User Id: ${createUser._id}`);
+            res.status(201).send(createUser);
+            
         }).catch(error => {
             return res.status(500).send({error : "Enable to hash Pass"})
         })
@@ -86,7 +87,7 @@ try{
         ]);
         if(existingUser){
             bcrypt.compare(password,existingUser[0].password).then(passwordCheck =>{
-                if(!passwordCheck) return res.status(400).send({error:"Password do not match"});
+                if(!passwordCheck) return res.status(400).send({error:"Username or Passwords do not match"});
                 //JWT 
                 const payload ={
                     _id:existingUser[0]._id,
@@ -100,7 +101,7 @@ try{
                 res.json({token : token});
             })
             .catch(error=>{
-                return res.status(400).send({error:"Passwords do not match"});
+                return res.status(400).send({error:"Username or Passwords do not match"});
             })
         } else {
             res.send({status: false, message:"Username not found"});

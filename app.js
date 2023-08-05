@@ -4,7 +4,7 @@ app.use(express.json());
 
 require("./db/conn");  //to create connection
 
-let port = 3001;
+let port = 3000;
 const EventRouter = require("./router/eventRouter");
 const UserRouter=require("./router/userRouter");
 
