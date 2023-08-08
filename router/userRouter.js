@@ -1,8 +1,8 @@
 const express = require("express");
 const router = new express.Router();
-const jwt= require("jsonwebtoken");
-const secretKey='eventmgmtK';
-const bcrypt=require('bcrypt');
+const jwt = require("jsonwebtoken");
+const secretKey = "eventmgmtK";
+const bcrypt = require("bcrypt");
 
 const Users = require("../models/userModel");
 
@@ -53,7 +53,9 @@ router.post("/user/register", async (req, res) => {
       }
     } catch (err) {
       console.error(err);
-      return res.status(500).send({ error: "Error occurred during registration" });
+      return res
+        .status(500)
+        .send({ error: "Error occurred during registration" });
     }
   } catch (e) {
     console.error(e);
@@ -61,56 +63,56 @@ router.post("/user/register", async (req, res) => {
   }
 });
 
-
 //Login API
-router.post("/user/login",async(req,res) =>{
-try{
-   
-    const username=req.body.username;
-    const password=req.body.password;
-    const existUsername= async() => {
-       
-        try{
-        const result=Users.findOne({username});
+router.post("/user/login", async (req, res) => {
+  try {
+    const username = req.body.username;
+    const password = req.body.password;
+    const existUsername = async () => {
+      try {
+        const result = Users.findOne({ username });
         return result;
-        } catch(e){
-            throw new Error(e);
-        }
+      } catch (e) {
+        throw new Error(e);
+      }
+    };
+    try {
+      const existingUser = await Promise.all([existUsername()]);
+      if (existingUser) {
+        console.log("Userdetails",existingUser);
+        bcrypt
+          .compare(password, existingUser[0].password)
+          .then((passwordCheck) => {
+            if (!passwordCheck)
+              return res
+                .status(400)
+                .send({ error: "Username or Passwords do not match" });
+            //JWT
+            const payload = {
+              _id: existingUser[0]._id,
+              role: existingUser[0].role,
+              name: existingUser[0].name,
+            };
+            const options = {
+              expiresIn: "5h",
+            };
+            const token = jwt.sign(payload, secretKey, options);
+            res.json({ token: token });
+          })
+          .catch((error) => {
+            return res
+              .status(400)
+              .send({ error: "Username or Passwords do not match" });
+          });
+      } else {
+        res.send({ status: false, message: "Username not found" });
+      }
+    } catch (e) {
+      res.status(400).send(e);
     }
-    try{
-        const existingUser=await Promise.all([
-            existUsername()
-        ]);
-        if(existingUser){
-            bcrypt.compare(password,existingUser[0].password).then(passwordCheck =>{
-                if(!passwordCheck) return res.status(400).send({error:"Username or Passwords do not match"});
-                //JWT 
-                const payload ={
-                    _id:existingUser[0]._id,
-                    role:existingUser[0].role,
-                    name:existingUser[0].name,
-                }
-                const options={
-                    expiresIn:"5h",
-                };
-                const token=jwt.sign(payload, secretKey, options);
-                res.json({token : token});
-            })
-            .catch(error=>{
-                return res.status(400).send({error:"Username or Passwords do not match"});
-            })
-        } else {
-            res.send({status: false, message:"Username not found"});
-        }
-    } catch(e){
-        res.status(400).send(e);
-    }
-
-
-} catch(e){
+  } catch (e) {
     res.status(400).send(e);
-}
-})
-
+  }
+});
 
 module.exports = router;
