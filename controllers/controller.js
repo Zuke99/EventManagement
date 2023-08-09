@@ -10,7 +10,7 @@ const Mailgen = require("mailgen");
 
 
 
-
+//Creating JWT Token
 const create_token = async( payload)=>{
     try {
      const token = await jwt.sign(payload,secretKey);
@@ -20,6 +20,7 @@ const create_token = async( payload)=>{
     }
 }
 
+//Decoding JWT Token from headers to get useful info
 const decodeToken = (token) =>{
     try{
     const tokenValue=token;
@@ -78,7 +79,7 @@ const sendMail = (email,eventExist) =>{
     
 }
 
-
+//User Login
 const user_login=async(req,res)=>{
     try {
         const email=req.body.email;
@@ -133,10 +134,11 @@ const event_registration = async(req,res) =>{
                 userId:decodedToken._id,
                 eventId:req.body.eventId
         })
+        //Checking if the ticket is Already Booked
         if(ticketExist){
             res.status(400).send({message: "Ticket has been Booked Already"});
         } else {
-        
+            //Checking if the Event Exists
             const eventExists= await Event.findById(req.body.eventId);
             if(eventExists){
                 const seats=eventExists.seats;
@@ -150,7 +152,7 @@ const event_registration = async(req,res) =>{
             let updatedSeats = seats - 1;
             const updateEvent= await Event.findByIdAndUpdate(
                 {_id:req.body.eventId},
-            {$set:{seats : updatedSeats}}
+                {$set:{seats : updatedSeats}}
             ).then(updateEvent => {
                 if(updateEvent){
                     console.log("Seats Updated");
@@ -177,8 +179,41 @@ const event_registration = async(req,res) =>{
         res.status(400).send(error.message)
     }
 }
+//DeRegistration
+const event_deregistration= async(req,res) => {
+    //res.send("hello");
+    const token = req.headers["authorization"];
+        const decodedToken=decodeToken(token);
+        const ticketExist = await Ticket.findOne({
+                userId:decodedToken._id,
+                eventId:req.body.eventId
+        })
+        if(ticketExist){
+            try{
+            const deleteTciket= await Ticket.deleteOne({
+                userId : decodedToken._id,
+                eventId: req.body.eventId
+            })
+            //Reduce number of Seat
+            const getEvent = await Event.findById(req.body.eventId);
+            let getSeats = getEvent.seats;
+            getSeats=getSeats+1;
+            const updateSeats= await Event.findByIdAndUpdate(req.body.eventId,
+                {
+                seats : getSeats
+            })
+            res.status(201).send({message : "Event Deregistration Successful" , data : deleteTciket , seatsUpdate : updateSeats});
+        } catch (error){
+            res.status(400).send(error.message)
+        }
+           
+        } else {
+            res.status(400).send({message : "Ticket Not Found"});
+        }
+}
 
 module.exports ={
     user_login,
-    event_registration
+    event_registration,
+    event_deregistration
 }
