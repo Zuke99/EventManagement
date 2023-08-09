@@ -7,13 +7,15 @@ const verifyToken = async(req,res,next)=>{
 
     if (!token) {
         res.status(200).send({success:false,msg:"A token is required for authentication"});
-    }
+    } else {
     try {
        const decode= jwt.verify(token,secretkey);
        req.user=decode;
+       return next();
     } catch (error) {
         res.status(400).send("Invalid token");
     }
-    return next();
+}
+   
 }
 module.exports = verifyToken;

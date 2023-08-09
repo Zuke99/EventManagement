@@ -7,7 +7,7 @@ const controller=require("../controllers/controller")
 const Users = require("../models/userModel");
 const Auth= require("../middleware/auth");
 
-
+//register user
 router.post("/user/register", async (req, res) => {
   try {
     //Check For Existing username
@@ -55,7 +55,9 @@ router.post("/user/register", async (req, res) => {
       }
     } catch (err) {
       console.error(err);
-      return res.status(500).send({ error: "Error occurred during registration" });
+      return res
+        .status(500)
+        .send({ error: "Error occurred during registration" });
     }
   } catch (e) {
     console.error(e);
@@ -63,9 +65,9 @@ router.post("/user/register", async (req, res) => {
   }
 });
 
-
 //Login API
 router.post("/user/login",controller.user_login); 
+
 
 router.get('/user/test',Auth, function (req,res){
      res.status(200).send({success:true,msg:"Authenticated"})
