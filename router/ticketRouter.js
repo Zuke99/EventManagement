@@ -8,6 +8,6 @@ const controller=require("../controllers/controller")
 
 router.post("/event/registerevent",Auth,controller.event_registration);
 router.post("/event/deregisterevent",Auth,controller.event_deregistration);
-
+router.get("/viewticket",controller.view_ticket);
 
 module.exports = router;

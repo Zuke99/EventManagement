@@ -36,7 +36,7 @@ const decodeToken = (token) =>{
 }
 
 //Send Mail
-const sendMail = (email,eventExist) =>{
+const sendMail = (email,eventExist,url) =>{
     let config = {
         service : 'gmail',
         auth : {
@@ -64,6 +64,15 @@ const sendMail = (email,eventExist) =>{
                         Description : `${eventExist.description}`,
                     }
                 ]
+               
+                
+            },
+            action :{
+                instructions: 'Click the button below to View Ticket',
+                button :{
+                    text: 'View Ticket',
+                    link: url,
+                }
             },
             outro:"Looking forward for more event registrations"
         }
@@ -162,9 +171,14 @@ const event_registration = async(req,res) =>{
             }).catch(error => {
                 console.error('Error updating Ticket', error);
             })
-            
             const createTicket = await addTicket.save();
-            sendMail(decodedToken.email,eventExists);
+            const name = eventExists.name || 'Default Name';
+            const description = eventExists.description || 'Default Description';
+          
+            const url = `http://localhost:3000/viewticket?name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`;
+            
+            sendMail(decodedToken.email,eventExists,url);
+            //res.send(`Generated URL: <a href="${url}">${url}</a>`);
             res.status(201).send({message : "Registered to the event Successfully" ,data : createTicket});
         } else {
             res.status(201).send({message: "There are no seats left"})
@@ -211,9 +225,21 @@ const event_deregistration= async(req,res) => {
             res.status(400).send({message : "Ticket Not Found"});
         }
 }
+        const view_ticket = (req,res) =>{
+            const name = req.query.name || 'No Name';
+                const description = req.query.description || 'No Description';
+
+                res.send(`
+                    <h1>Your Ticket Details<h1>
+                    <h2>Name: ${name}</h2>
+                    <p>Description: ${description}</p>
+                `);
+
+        }
 
 module.exports ={
     user_login,
     event_registration,
-    event_deregistration
+    event_deregistration,
+    view_ticket
 }
