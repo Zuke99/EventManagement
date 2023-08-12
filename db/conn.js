@@ -1,5 +1,7 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://eventmgmt:eventmgmt@eventmanagementcluster.b1x94pb.mongodb.net/?retryWrites=true&w=majority')
+
+mongoose.connect(process.env.DATABASE)
 .then(() => {
     console.log("Connection is successful");
 }).catch((e) => {
