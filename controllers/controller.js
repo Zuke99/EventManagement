@@ -4,7 +4,7 @@ const bcrypt=require("bcrypt");
 const jwt= require("jsonwebtoken");
 const Ticket = require("../models/ticketModel");
 const Event=require("../models/eventModel");
-const secretKey='eventmgmtK';
+const secretKey= process.env.SECRET_KEY;
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
