@@ -130,7 +130,7 @@ const user_login=async(req,res)=>{
         }
 
     } catch (error) {
-        res.status(400).send(error.message)
+        res.status(200).send({success:false, error :error.message})
     }
 }
 

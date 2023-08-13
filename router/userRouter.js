@@ -37,9 +37,9 @@ router.post("/user/register", async (req, res) => {
         existUsername(),
       ]);
       if (existingEmail) {
-        res.send({ message: "Email Exists" });
+        res.send({ status : false ,message: "Email Exists" });
       } else if (existingUsername) {
-        res.send({ message: "Username Exists" });
+        res.send({ status : false, message: "Username Exists" });
       } else {
         const hashedPassword = await bcrypt.hash(password, 10);
         const addUser = new Users({
