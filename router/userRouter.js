@@ -3,7 +3,7 @@ const router = new express.Router();
 const jwt= require("jsonwebtoken");
 const secretKey='eventmgmtK';
 const bcrypt=require('bcrypt');
-const controller=require("../controllers/controller")
+const controller=require("../controllers/controller");
 const Users = require("../models/userModel");
 const Auth= require("../middleware/auth");
 
