@@ -37,9 +37,9 @@ router.post("/user/register", async (req, res) => {
         existUsername(),
       ]);
       if (existingEmail) {
-        res.send({ message: "Email Exists" });
+        res.send({ status : false ,message: "Email Exists" });
       } else if (existingUsername) {
-        res.send({ message: "Username Exists" });
+        res.send({ status : false, message: "Username Exists" });
       } else {
         const hashedPassword = await bcrypt.hash(password, 10);
         const addUser = new Users({
@@ -67,9 +67,10 @@ router.post("/user/register", async (req, res) => {
 
 //Login API
 router.post("/user/login",controller.user_login); 
+router.get("/user/role",[Auth.verifyToken, Auth.adminCheck], controller.checkAdminRole)
+router.get("/user/loggedin",[Auth.verifyToken], controller.checkLogin);
 
-
-router.get('/user/test',Auth, function (req,res){
+router.get('/user/test',Auth.verifyToken, function (req,res){
      res.status(200).send({success:true,msg:"Authenticated"})
 });
 

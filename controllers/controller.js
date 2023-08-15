@@ -4,7 +4,7 @@ const bcrypt=require("bcrypt");
 const jwt= require("jsonwebtoken");
 const Ticket = require("../models/ticketModel");
 const Event=require("../models/eventModel");
-const secretKey= process.env.SECRET_KEY;
+const secretKey= 'eventmgmtK';
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
@@ -36,7 +36,7 @@ const decodeToken = (token) =>{
 }
 
 //Send Mail
-const sendMail = (email,eventExist) =>{
+const sendMail = (email,eventExist,url) =>{
     let config = {
         service : 'gmail',
         auth : {
@@ -64,6 +64,15 @@ const sendMail = (email,eventExist) =>{
                         Description : `${eventExist.description}`,
                     }
                 ]
+               
+                
+            },
+            action :{
+                instructions: 'Click the button below to View Ticket',
+                button :{
+                    text: 'View Ticket',
+                    link: url,
+                }
             },
             outro:"Looking forward for more event registrations"
         }
@@ -81,20 +90,24 @@ const sendMail = (email,eventExist) =>{
 
 //User Login
 const user_login=async(req,res)=>{
+
     try {
         const email=req.body.email;
         const password=req.body.password;
         const userData=await User.findOne({email:email});
+       
         if (userData) {
-            
            const matchPassword = await bcrypt.compare(password,userData.password);
            if (matchPassword) {
+       
             const payload={
                 _id : userData._id,
                 name : userData.name,
-                email : userData.email
+                email : userData.email,
+                role : userData.role
             }
             const token= await create_token(payload);
+          
                 const userDetails={
                    _id:userData._id,
                    name:userData.name,
@@ -104,24 +117,31 @@ const user_login=async(req,res)=>{
                    role:userData.role,
                    token:token
                 }
+
+              
                 
                 const response={
                     success:true,
                     msg:"User details",
                     data:userDetails
                 }
-                res.status(200).send(response)
+                
+              
+               
+                res.status(200).send({success : true , data : response , msg: "Login successful"})
            } 
            else {
-                res.status(200).send({success:false,msg:"Login details are incorrect"});
+    
+                res.status(200).send({success:false, msg:"Login details are incorrect"});
            }
         } 
         else {
+
               res.status(200).send({success:false,msg:"Login details are incorrect"});
         }
 
     } catch (error) {
-        res.status(400).send(error.message)
+        res.status(200).send({success:false, error :error.message})
     }
 }
 
@@ -162,9 +182,14 @@ const event_registration = async(req,res) =>{
             }).catch(error => {
                 console.error('Error updating Ticket', error);
             })
-            
             const createTicket = await addTicket.save();
-            sendMail(decodedToken.email,eventExists);
+            const name = eventExists.name || 'Default Name';
+            const description = eventExists.description || 'Default Description';
+          
+            const url = `http://localhost:3000/viewticket?name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`;
+            
+            sendMail(decodedToken.email,eventExists,url);
+            //res.send(`Generated URL: <a href="${url}">${url}</a>`);
             res.status(201).send({message : "Registered to the event Successfully" ,data : createTicket});
         } else {
             res.status(201).send({message: "There are no seats left"})
@@ -211,9 +236,34 @@ const event_deregistration= async(req,res) => {
             res.status(400).send({message : "Ticket Not Found"});
         }
 }
+        const view_ticket = (req,res) =>{
+            const name = req.query.name || 'No Name';
+                const description = req.query.description || 'No Description';
+
+                res.send(`
+                    <h1>Your Ticket Details<h1>
+                    <h2>Name: ${name}</h2>
+                    <p>Description: ${description}</p>
+                `);
+
+        }
+
+    const checkAdminRole = (req, res) =>{
+        const token= req.body.token || req.query.token || req.headers["authorization"];
+        const decode= jwt.verify(token,secretKey);
+       const {role} = decode;
+       res.send({status : true, result : role});
+    }
+
+    const checkLogin = (req, res) => {
+        res.send({status : true, message : "User is Logged in"});
+    }
 
 module.exports ={
     user_login,
     event_registration,
-    event_deregistration
+    event_deregistration,
+    view_ticket,
+    checkAdminRole,
+    checkLogin
 }
