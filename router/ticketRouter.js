@@ -6,8 +6,8 @@ const controller=require("../controllers/controller")
 //User Register Event
 
 
-router.post("/event/registerevent",Auth,controller.event_registration);
-router.post("/event/deregisterevent",Auth,controller.event_deregistration);
+router.post("/event/registerevent",Auth.verifyToken,controller.event_registration);
+router.post("/event/deregisterevent",Auth.verifyToken,controller.event_deregistration);
 router.get("/viewticket",controller.view_ticket);
 
 module.exports = router;

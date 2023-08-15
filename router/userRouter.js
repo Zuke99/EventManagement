@@ -67,9 +67,10 @@ router.post("/user/register", async (req, res) => {
 
 //Login API
 router.post("/user/login",controller.user_login); 
+router.get("/user/role",[Auth.verifyToken, Auth.adminCheck], controller.checkAdminRole)
+router.get("/user/loggedin",[Auth.verifyToken], controller.checkLogin);
 
-
-router.get('/user/test',Auth, function (req,res){
+router.get('/user/test',Auth.verifyToken, function (req,res){
      res.status(200).send({success:true,msg:"Authenticated"})
 });
 

@@ -3,6 +3,7 @@ const secretkey='eventmgmtK';
 
 const verifyToken = async(req,res,next)=>{
    
+   
     const token = req.body.token || req.query.token || req.headers["authorization"];
 
     if (!token) {
@@ -18,4 +19,16 @@ const verifyToken = async(req,res,next)=>{
 }
    
 }
-module.exports = verifyToken;
+
+const adminCheck = async(req,res,next) => {
+    const token= req.body.token || req.query.token || req.headers["authorization"];
+    const decode= jwt.verify(token,secretkey);
+       const {role} = decode;
+       if(role){
+       return next();
+       } else {
+        res.send({status : false , message : "Admin Role Required"});
+       }
+       
+}
+module.exports = {verifyToken, adminCheck};

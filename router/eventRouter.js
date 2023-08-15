@@ -2,14 +2,15 @@ const express = require("express");
 const router = new express.Router();
 const Auth= require("../middleware/auth");
 
+
 const Events = require("../models/eventModel");
 
-router.get("/", (req, res) => {
-    res.send("Hello from the other side");
+router.get("/events/testing/admin",[Auth.verifyToken, Auth.adminCheck] ,(req, res) => {
+    res.send({status: true});
 });
 
 //ADD Event
-router.post("/event",Auth, async(req, res) => {
+router.post("/event",[Auth.verifyToken], async(req, res) => {
     try {
         const addEvent = new Events(req.body);
         const createEve = await addEvent.save();
@@ -64,7 +65,7 @@ router.get("/event/:category_id", async(req, res) => {
 });
 
 //UPDATE Event using id
-router.patch("/event/:id",Auth, async(req, res) => {
+router.patch("/event/:id",Auth.verifyToken, async(req, res) => {
     try{
         const _id = req.params.id;
         const updateEve = await Events.findByIdAndUpdate(_id, req.body, {
@@ -78,7 +79,7 @@ router.patch("/event/:id",Auth, async(req, res) => {
 });
 
 //DELETE Event using id
-router.delete("/event/:id",Auth, async(req, res) => {
+router.delete("/event/:id",Auth.verifyToken, async(req, res) => {
     try{
         const _id = req.params.id;
         const delEvent = await Events.findByIdAndDelete(_id);
