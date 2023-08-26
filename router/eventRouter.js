@@ -1,34 +1,42 @@
 const express = require("express");
 const router = new express.Router();
-const Auth= require("../middleware/auth");
-
-
+const Auth = require("../middleware/auth");
+const controller = require("../controllers/controller")
 const Events = require("../models/eventModel");
 
-router.get("/events/testing/admin",[Auth.verifyToken, Auth.adminCheck] ,(req, res) => {
-    res.send({status: true});
-});
+router.get(
+  "/events/testing/admin",
+  [Auth.verifyToken, Auth.adminCheck],
+  (req, res) => {
+    res.send({ status: true });
+  }
+);
 
 //ADD Event
-router.post("/event",[Auth.verifyToken], async(req, res) => {
-    try {
-        const addEvent = new Events(req.body);
-        const createEve = await addEvent.save();
-        res.status(201).send(createEve);
-        console.log(`Event Id: ${createEve._id}`);
-    } catch(e) {
-        res.status(400).send(e);
-    }
+router.post("/event", [Auth.verifyToken], async (req, res) => {
+  try {
+    const addEvent = new Events(req.body);
+    const token  = req.headers["authorization"];
+    const userInfo = controller.decodeToken(token);
+    addEvent.owner=userInfo._id;
+    const createEve = await addEvent.save();
+    console.log("Create", createEve);
+    res.status(201).send({data : createEve, message: "Event Created Successfully"});
+    console.log(`Event Created Successfully: ${createEve._id}`);
+  } catch (e) {
+    console.log("Error", e);
+    res.status(400).send(e);
+  }
 });
 
 //GET All Events
-router.get("/event", async(req, res) => {
-    try {
-        const getEvent = await Events.find({});
-        res.send(getEvent);
-    } catch(e) {
-        res.satus(400).send(e);
-    }
+router.get("/event", async (req, res) => {
+  try {
+    const getEvent = await Events.find({});
+    res.send(getEvent);
+  } catch (e) {
+    res.satus(400).send(e);
+  }
 });
 
 //get particular event using id
@@ -54,40 +62,40 @@ router.get("/event", async(req, res) => {
 // });
 
 //FILTER event using category_id
-router.get("/event/:category_id", async(req, res) => {
-    try {
-        const category_id = req.params.category_id;
-        const getEve = await Events.find({category_id : category_id});
-        res.send(getEve);
-    } catch(e) {
-        res.status(400).send(e);
-    }
+router.get("/event/:category_id", async (req, res) => {
+  try {
+    const category_id = req.params.category_id;
+    const getEve = await Events.find({ category_id: category_id });
+    res.send(getEve);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 //UPDATE Event using id
-router.patch("/event/:id",Auth.verifyToken, async(req, res) => {
-    try{
-        const _id = req.params.id;
-        const updateEve = await Events.findByIdAndUpdate(_id, req.body, {
-            new: true
-        });
-        res.send(updateEve);
-        console.log("Success");
-    } catch(e) {
-        res.status(500).send(e);
-    }
+router.patch("/event/:id", Auth.verifyToken, async (req, res) => {
+  try {
+    const _id = req.params.id;
+    const updateEve = await Events.findByIdAndUpdate(_id, req.body, {
+      new: true,
+    });
+    res.send(updateEve);
+    console.log("Success");
+  } catch (e) {
+    res.status(500).send(e);
+  }
 });
 
 //DELETE Event using id
-router.delete("/event/:id",Auth.verifyToken, async(req, res) => {
-    try{
-        const _id = req.params.id;
-        const delEvent = await Events.findByIdAndDelete(_id);
-        res.send(delEvent);
-        console.log("Success");
-    } catch(e) {
-        res.status(500).send(e);
-    }
+router.delete("/event/:id", Auth.verifyToken, async (req, res) => {
+  try {
+    const _id = req.params.id;
+    const delEvent = await Events.findByIdAndDelete(_id);
+    res.send(delEvent);
+    console.log("Success");
+  } catch (e) {
+    res.status(500).send(e);
+  }
 });
 
 module.exports = router;
