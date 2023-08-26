@@ -22,6 +22,7 @@ const create_token = async( payload)=>{
 
 //Decoding JWT Token from headers to get useful info
 const decodeToken = (token) =>{
+    console.log("Inside Decode Token");
     try{
     const tokenValue=token;
     const decodedTokenValue=jwt.verify(tokenValue, secretKey);
@@ -128,25 +129,26 @@ const user_login=async(req,res)=>{
                 
               
                
-                res.status(200).send({success : true , data : response , msg: "Login successful"})
+                res.send({status : true , data : response , message: "Login successful"})
            } 
            else {
     
-                res.status(200).send({success:false, msg:"Login details are incorrect"});
+                res.send({status:false, message:"Login details are incorrect"});
            }
         } 
         else {
 
-              res.status(200).send({success:false,msg:"Login details are incorrect"});
+              res.send({status:false,message:"Login details are incorrect"});
         }
 
     } catch (error) {
-        res.status(200).send({success:false, error :error.message})
+        res.send({status:false, message :error.message})
     }
 }
 
 //Register Event
 const event_registration = async(req,res) =>{
+    console.log("here");
     try{
         const token = req.headers["authorization"];
         const decodedToken=decodeToken(token);
@@ -156,13 +158,13 @@ const event_registration = async(req,res) =>{
         })
         //Checking if the ticket is Already Booked
         if(ticketExist){
-            res.status(400).send({message: "Ticket has been Booked Already"});
+            res.send({status : false , message: "Ticket has been Booked Already"});
         } else {
             //Checking if the Event Exists
             const eventExists= await Event.findById(req.body.eventId);
             if(eventExists){
                 const seats=eventExists.seats;
-                if(seats>0){
+                if(seats>0 || seats === -1){
                 const addTicket=new Ticket({
                 eventId:req.body.eventId,
                 userId:decodedToken._id,
@@ -190,18 +192,18 @@ const event_registration = async(req,res) =>{
             
             sendMail(decodedToken.email,eventExists,url);
             //res.send(`Generated URL: <a href="${url}">${url}</a>`);
-            res.status(201).send({message : "Registered to the event Successfully" ,data : createTicket});
+            res.send({status : true, message : "Registered to the event Successfully" ,data : createTicket});
         } else {
-            res.status(201).send({message: "There are no seats left"})
+            res.send({status : false, message: "There are no seats left"});
         }
         } else {
-            res.status(400).send({message : "There is no such event"});
+            res.send({status : false, message: "There is no such event"});
         }
         }
 
 
     }catch (error) {
-        res.status(400).send(error.message)
+        res.send({status : false, message:error.message});
     }
 }
 //DeRegistration
@@ -236,6 +238,9 @@ const event_deregistration= async(req,res) => {
             res.status(400).send({message : "Ticket Not Found"});
         }
 }
+
+
+
         const view_ticket = (req,res) =>{
             const name = req.query.name || 'No Name';
                 const description = req.query.description || 'No Description';
@@ -259,11 +264,25 @@ const event_deregistration= async(req,res) => {
         res.send({status : true, message : "User is Logged in"});
     }
 
+    const userDetails = (req, res) =>{
+        const token= req.body.token || req.query.token || req.headers["authorization"];
+        const decode= jwt.verify(token,secretKey);
+        const {_id, name, email} = decode;
+        const data = {
+            _id : _id,
+            name : name,
+            email : email
+        }
+        res.send({status: true, data : data})
+    }
+
 module.exports ={
     user_login,
     event_registration,
     event_deregistration,
     view_ticket,
     checkAdminRole,
-    checkLogin
+    checkLogin,
+    decodeToken,
+    userDetails
 }

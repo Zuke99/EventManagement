@@ -1,7 +1,7 @@
 const express = require("express");
 const router = new express.Router();
 const Auth = require("../middleware/auth");
-
+const controller = require("../controllers/controller")
 const Events = require("../models/eventModel");
 
 router.get(
@@ -16,10 +16,15 @@ router.get(
 router.post("/event", [Auth.verifyToken], async (req, res) => {
   try {
     const addEvent = new Events(req.body);
+    const token  = req.headers["authorization"];
+    const userInfo = controller.decodeToken(token);
+    addEvent.owner=userInfo._id;
     const createEve = await addEvent.save();
-    res.status(201).send(createEve);
-    console.log(`Event Id: ${createEve._id}`);
+    console.log("Create", createEve);
+    res.status(201).send({data : createEve, message: "Event Created Successfully"});
+    console.log(`Event Created Successfully: ${createEve._id}`);
   } catch (e) {
+    console.log("Error", e);
     res.status(400).send(e);
   }
 });
