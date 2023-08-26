@@ -17,10 +17,10 @@ router.post("/event", [Auth.verifyToken], async (req, res) => {
   try {
     const addEvent = new Events(req.body);
     const createEve = await addEvent.save();
-    res.status(201).send(createEve);
+    res.send({status : true , data : createEve, message : "Event Created Successfully"});
     console.log(`Event Id: ${createEve._id}`);
   } catch (e) {
-    res.status(400).send(e);
+    res.send({status : false , data : e});
   }
 });
 
@@ -28,7 +28,7 @@ router.post("/event", [Auth.verifyToken], async (req, res) => {
 router.get("/event", async (req, res) => {
   try {
     const getEvent = await Events.find({});
-    res.send(getEvent);
+    res.send({status : true , data :getEvent});
   } catch (e) {
     res.satus(400).send(e);
   }
@@ -61,7 +61,7 @@ router.get("/event/:category_id", async (req, res) => {
   try {
     const category_id = req.params.category_id;
     const getEve = await Events.find({ category_id: category_id });
-    res.send(getEve);
+    res.send({status : true , data : getEve});
   } catch (e) {
     res.status(400).send(e);
   }
@@ -74,7 +74,7 @@ router.patch("/event/:id", Auth.verifyToken, async (req, res) => {
     const updateEve = await Events.findByIdAndUpdate(_id, req.body, {
       new: true,
     });
-    res.send(updateEve);
+    res.send({status : true , result : updateEve});
     console.log("Success");
   } catch (e) {
     res.status(500).send(e);

@@ -90,7 +90,7 @@ const sendMail = (email,eventExist,url) =>{
 
 //User Login
 const user_login=async(req,res)=>{
-
+console.log("her");
     try {
         const email=req.body.email;
         const password=req.body.password;
@@ -128,7 +128,7 @@ const user_login=async(req,res)=>{
                 
               
                
-                res.status(200).send({success : true , data : response , msg: "Login successful"})
+                res.send({status : true , data : response , msg: "Login successful"})
            } 
            else {
     
