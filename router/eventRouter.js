@@ -35,7 +35,7 @@ router.get("/event", async (req, res) => {
     const getEvent = await Events.find({});
     res.send(getEvent);
   } catch (e) {
-    res.satus(400).send(e);
+    res.status(400).send(e);
   }
 });
 
@@ -62,10 +62,11 @@ router.get("/event", async (req, res) => {
 // });
 
 //FILTER event using category_id
-router.get("/event/:category_id", async (req, res) => {
+router.get("/event/:category", async (req, res) => {
   try {
-    const category_id = req.params.category_id;
-    const getEve = await Events.find({ category_id: category_id });
+    console.log("get all events");
+    const category = req.params.category;
+    const getEve = await Events.find({ category: category });
     res.send(getEve);
   } catch (e) {
     res.status(400).send(e);
@@ -87,10 +88,10 @@ router.patch("/event/:id", Auth.verifyToken, async (req, res) => {
 });
 
 //DELETE Event using id
-router.delete("/event/:id", Auth.verifyToken, async (req, res) => {
+router.delete("/event/:category", Auth.verifyToken, async (req, res) => {
   try {
-    const _id = req.params.id;
-    const delEvent = await Events.findByIdAndDelete(_id);
+    const category = req.params.category;
+    const delEvent = await Events.findOneAndDelete({category:category});
     res.send(delEvent);
     console.log("Success");
   } catch (e) {
