@@ -20,7 +20,7 @@ router.post("/event", [Auth.verifyToken], async (req, res) => {
     const userInfo = controller.decodeToken(token);
     addEvent.owner=userInfo._id;
     const createEve = await addEvent.save();
-    res.send({status : true , data : createEve, message : "Event Created Successfully"});
+    res.send({status : true , data : createEve, message : "Events Created Successfully"});
     console.log(`Event Id: ${createEve._id}`);
   } catch (e) {
     res.send({status : false , data : e});
