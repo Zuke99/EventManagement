@@ -71,7 +71,7 @@ router.get("/user/role",[Auth.verifyToken, Auth.adminCheck], controller.checkAdm
 router.get("/user/loggedin",[Auth.verifyToken], controller.checkLogin);
 
 router.get('/user/test',Auth.verifyToken, function (req,res){
-     res.status(200).send({success:true,msg:"Authenticated"})
+     res.status(200).send({status:true,message:"Authenticated"})
 });
 
 module.exports = router;
