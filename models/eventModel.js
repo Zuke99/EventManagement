@@ -7,7 +7,7 @@ const eventSchema = new mongoose.Schema({
   },
   description: String,
   seats: Number,
-  category_id: Number,
+  category: String,
   posterImage: String,
   owner: String,
   date: Date,
