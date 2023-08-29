@@ -1,22 +1,22 @@
 const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    unique: [true, "Event already exists"],
-  },
+  name: String,
   description: String,
   seats: Number,
-  category_id: Number,
+  category: String,
   posterImage: String,
   owner: String,
   date: Date,
-  time: Date,
-  duration: Number,
+  start_time: String,
+  end_time: String,
   venue: String,
+  about:String,
   tags: [String],
-  approval: Boolean,
+  approval: {
+    type:Boolean,
+    default : false
+  },
   organisation: String,
 });
-
 module.exports = mongoose.model("Events", eventSchema);

@@ -3,7 +3,7 @@ const router = new express.Router();
 const jwt= require("jsonwebtoken");
 const secretKey='eventmgmtK';
 const bcrypt=require('bcrypt');
-const controller=require("../controllers/controller")
+const controller=require("../controllers/controller");
 const Users = require("../models/userModel");
 const Auth= require("../middleware/auth");
 
@@ -51,7 +51,7 @@ router.post("/user/register", async (req, res) => {
         });
         const createUser = await addUser.save();
         console.log(`User Registration Successful, User Id: ${createUser._id}`);
-        res.status(201).send(createUser);
+        res.send({status : true , data : createUser});
       }
     } catch (err) {
       console.error(err);
@@ -69,9 +69,10 @@ router.post("/user/register", async (req, res) => {
 router.post("/user/login",controller.user_login); 
 router.get("/user/role",[Auth.verifyToken, Auth.adminCheck], controller.checkAdminRole)
 router.get("/user/loggedin",[Auth.verifyToken], controller.checkLogin);
+router.get("/user/details",[Auth.verifyToken], controller.userDetails);
 
 router.get('/user/test',Auth.verifyToken, function (req,res){
-     res.status(200).send({status:true,message:"Authenticated"})
+     res.send({status:true,message:"Authenticated"})
 });
 
 module.exports = router;

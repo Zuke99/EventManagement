@@ -1,7 +1,7 @@
 const express = require("express");
 const router = new express.Router();
 const Auth = require("../middleware/auth");
-
+const controller = require("../controllers/controller")
 const Events = require("../models/eventModel");
 
 router.get(
@@ -16,6 +16,9 @@ router.get(
 router.post("/event", [Auth.verifyToken], async (req, res) => {
   try {
     const addEvent = new Events(req.body);
+    const token  = req.headers["authorization"];
+    const userInfo = controller.decodeToken(token);
+    addEvent.owner=userInfo._id;
     const createEve = await addEvent.save();
     res.send({status : true , data : createEve, message : "Event Created Successfully"});
     console.log(`Event Id: ${createEve._id}`);
@@ -30,7 +33,7 @@ router.get("/event", async (req, res) => {
     const getEvent = await Events.find({});
     res.send({status : true , data :getEvent});
   } catch (e) {
-    res.satus(400).send(e);
+    res.status(400).send(e);
   }
 });
 
@@ -57,7 +60,7 @@ router.get("/event", async (req, res) => {
 // });
 
 //FILTER event using category_id
-router.get("/event/:category_id", async (req, res) => {
+router.get("/event/:category", async (req, res) => {
   try {
     const category_id = req.params.category_id;
     const getEve = await Events.find({ category_id: category_id });
@@ -82,10 +85,10 @@ router.patch("/event/:id", Auth.verifyToken, async (req, res) => {
 });
 
 //DELETE Event using id
-router.delete("/event/:id", Auth.verifyToken, async (req, res) => {
+router.delete("/event/:category", Auth.verifyToken, async (req, res) => {
   try {
-    const _id = req.params.id;
-    const delEvent = await Events.findByIdAndDelete(_id);
+    const category = req.params.category;
+    const delEvent = await Events.findOneAndDelete({category:category});
     res.send(delEvent);
     console.log("Success");
   } catch (e) {

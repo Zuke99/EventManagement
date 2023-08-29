@@ -6,17 +6,20 @@ app.use(cors());
 
 require("./db/conn");  //to create connection
 
-let port = 8080;
+let port = 8083;
 const EventRouter = require("./router/eventRouter");
 const UserRouter=require("./router/userRouter");
 const TicketRouter=require("./router/ticketRouter");
+const CategoryRouter=require("./router/categoryRouter");
 
 app.use(EventRouter);
 app.use(UserRouter);
 app.use(TicketRouter);
+app.use(CategoryRouter);
 
 //Port
 app.listen(port,function(){
     console.log("I am Listening to port",port);
 })
+
 
