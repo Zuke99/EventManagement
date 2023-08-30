@@ -33,7 +33,7 @@ router.get("/event", async (req, res) => {
     const getEvent = await Events.find({});
     res.send({status : true , data :getEvent});
   } catch (e) {
-    res.status(400).send(e);
+    res.send({status : false , data : e});
   }
 });
 
@@ -66,7 +66,7 @@ router.get("/event/:category", async (req, res) => {
     const getEve = await Events.find({ category_id: category_id });
     res.send({status : true , data : getEve});
   } catch (e) {
-    res.status(400).send(e);
+    res.send({status : false , data : e});
   }
 });
 
@@ -80,7 +80,7 @@ router.patch("/event/:id", Auth.verifyToken, async (req, res) => {
     res.send({status : true , result : updateEve});
     console.log("Success");
   } catch (e) {
-    res.status(500).send(e);
+    res.send({status : false , data : e});
   }
 });
 
@@ -89,8 +89,13 @@ router.delete("/event/:category", Auth.verifyToken, async (req, res) => {
   try {
     const category = req.params.category;
     const delEvent = await Events.findOneAndDelete({category:category});
-    res.send(delEvent);
-    console.log("Success");
+    if(delEvent.length>0){
+    res.send({status:true, data: delEvent});
+    }
+    //console.log("Success");
+    else{
+      res.send({status:false, message:"No event exist"});
+    }
   } catch (e) {
     res.status(500).send(e);
   }
