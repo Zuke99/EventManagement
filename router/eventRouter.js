@@ -3,6 +3,7 @@ const router = new express.Router();
 const Auth = require("../middleware/auth");
 const controller = require("../controllers/controller")
 const Events = require("../models/eventModel");
+const uploadImage = require("../controllers/uploadImage");
 
 router.get(
   "/events/testing/admin",
@@ -20,7 +21,7 @@ router.post("/event", [Auth.verifyToken], async (req, res) => {
     const userInfo = controller.decodeToken(token);
     addEvent.owner=userInfo._id;
     const createEve = await addEvent.save();
-    res.send({status : true , data : createEve, message : "Event Created Successfully"});
+    res.send({status : true , data : createEve, message : "Events Created Successfully"});
     console.log(`Event Id: ${createEve._id}`);
   } catch (e) {
     res.send({status : false , data : e});
@@ -100,5 +101,31 @@ router.delete("/event/:category", Auth.verifyToken, async (req, res) => {
     res.status(500).send(e);
   }
 });
+
+router.put("/event/approval/approveevent",Auth.verifyToken, async(req,res) => {
+  try{
+    console.log("Approve Inside", req.body.eventId);
+    const eventId = req.body.eventId;
+    const approveEvent = await Events.findByIdAndUpdate(
+      eventId,
+      {approval : true},
+      {new : true}
+      );
+      if(!approveEvent){
+        return res.send({status : false , message : "Event not Found"});
+      } 
+      res.send({status : true , message : "Event Approved Successfully"});
+    
+  } catch (e) {
+    res.send({status : false, message : e});
+  }
+})
+
+router.post("/uploadImage", (req,res) => {
+  console.log("here upload")
+  uploadImage(req.body.image)
+  .then((url) => res.send(url))
+  .catch((err) => res.status(500).send(err));
+})
 
 module.exports = router;

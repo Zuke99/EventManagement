@@ -148,7 +148,7 @@ console.log("her");
 
 //Register Event
 const event_registration = async(req,res) =>{
-    console.log("here");
+    console.log("here", req.body);
     try{
         const token = req.headers["authorization"];
         const decodedToken=decodeToken(token);
