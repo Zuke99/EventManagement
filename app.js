@@ -6,7 +6,7 @@ app.use(cors());
 
 require("./db/conn");  //to create connection
 
-let port = 8084;
+let port = 8080;
 const EventRouter = require("./router/eventRouter");
 const UserRouter=require("./router/userRouter");
 const TicketRouter=require("./router/ticketRouter");
