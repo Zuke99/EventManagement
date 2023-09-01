@@ -70,7 +70,7 @@ router.post("/user/login",controller.user_login);
 router.get("/user/role",[Auth.verifyToken, Auth.adminCheck], controller.checkAdminRole)
 router.get("/user/loggedin",[Auth.verifyToken], controller.checkLogin);
 router.get("/user/details",[Auth.verifyToken], controller.userDetails);
-
+router.get("/user/organisation",[Auth.verifyToken],controller.userOrganisation);
 router.get('/user/test',Auth.verifyToken, function (req,res){
      res.send({status:true,message:"Authenticated"})
 });

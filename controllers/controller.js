@@ -276,6 +276,17 @@ const event_deregistration= async(req,res) => {
         res.send({status: true, data : data})
     }
 
+    const userOrganisation = async (req,res) => {
+        const getUsers = await User.find({
+            role : 1,
+        })
+        if(getUsers){
+            res.send({status : true, data : getUsers});
+        } else {
+            res.send({status : false, message : "Could'nt Find Organisations"});
+        }
+    }
+
 module.exports ={
     user_login,
     event_registration,
@@ -284,5 +295,6 @@ module.exports ={
     checkAdminRole,
     checkLogin,
     decodeToken,
-    userDetails
+    userDetails,
+    userOrganisation,
 }
